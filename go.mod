@@ -9,6 +9,7 @@ require (
 	github.com/containerd/go-cni v1.0.1
 	github.com/containerd/stargz-snapshotter v0.2.0
 	github.com/containerd/typeurl v1.0.1
+	github.com/containernetworking/cni v0.8.0
 	github.com/containernetworking/plugins v0.9.0
 	github.com/docker/cli v20.10.0+incompatible
 	github.com/docker/go-units v0.4.0

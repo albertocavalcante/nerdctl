@@ -15,27 +15,16 @@
    limitations under the License.
 */
 
-package main
+package netutil
 
-import (
-	"github.com/AkihiroSuda/nerdctl/pkg/ocihook"
-	"github.com/pkg/errors"
-	"github.com/urfave/cli/v2"
-)
+import "testing"
 
-var internalOCIHookCommand = &cli.Command{
-	Name:   "oci-hook",
-	Usage:  "OCI hook",
-	Action: internalOCIHookAction,
-}
-
-func internalOCIHookAction(clicontext *cli.Context) error {
-	event := clicontext.Args().First()
-	if event == "" {
-		return errors.New("event type needs to be passed")
+func TestDefaultConfigList(t *testing.T) {
+	x := DefaultConfigList()
+	t.Log(string(x.Bytes))
+	plugins := RequiredCNIPlugins(x)
+	t.Log(plugins)
+	if IsExternalConfigList(x.Bytes) {
+		t.Fail()
 	}
-	return ocihook.Run(clicontext.App.Reader, clicontext.App.ErrWriter, event,
-		clicontext.String("cni-path"),
-		clicontext.String("cni-netconfpath"),
-	)
 }

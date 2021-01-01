@@ -18,24 +18,35 @@
 package main
 
 import (
-	"github.com/AkihiroSuda/nerdctl/pkg/ocihook"
-	"github.com/pkg/errors"
+	"fmt"
+	"text/tabwriter"
+
+	"github.com/AkihiroSuda/nerdctl/pkg/netutil"
 	"github.com/urfave/cli/v2"
 )
 
-var internalOCIHookCommand = &cli.Command{
-	Name:   "oci-hook",
-	Usage:  "OCI hook",
-	Action: internalOCIHookAction,
+var networkLsCommand = &cli.Command{
+	Name:    "ls",
+	Aliases: []string{"list"},
+	Usage:   "List networks",
+	Action:  networkLsAction,
 }
 
-func internalOCIHookAction(clicontext *cli.Context) error {
-	event := clicontext.Args().First()
-	if event == "" {
-		return errors.New("event type needs to be passed")
+func networkLsAction(clicontext *cli.Context) error {
+	ll, err := netutil.ConfigLists(clicontext.String("cni-netconfpath"))
+	if err != nil {
+		return err
 	}
-	return ocihook.Run(clicontext.App.Reader, clicontext.App.ErrWriter, event,
-		clicontext.String("cni-path"),
-		clicontext.String("cni-netconfpath"),
-	)
+	w := tabwriter.NewWriter(clicontext.App.Writer, 4, 8, 4, ' ', 0)
+	fmt.Fprintln(w, "NAME\tKIND")
+	for _, l := range ll {
+		kind := "nerdctl"
+		if l.File == "" {
+			kind = "nerdctl (builtin)"
+		} else if !l.Nerdctl {
+			kind = "external"
+		}
+		fmt.Fprintf(w, "%s\t%s\n", l.Name, kind)
+	}
+	return w.Flush()
 }

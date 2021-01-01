@@ -18,6 +18,7 @@
 package main
 
 import (
+	"regexp"
 	"strings"
 )
 
@@ -36,4 +37,13 @@ func ConvertKVStringsToMap(values []string) map[string]string {
 	}
 
 	return result
+}
+
+// TODO: is there stdlib for this?
+func IsAlphaNum(s string) bool {
+	ok, err := regexp.MatchString("^[a-zA-Z0-9]+$", s)
+	if err != nil {
+		panic(err)
+	}
+	return ok
 }
